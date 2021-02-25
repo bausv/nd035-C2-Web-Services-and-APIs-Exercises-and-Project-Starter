@@ -26,5 +26,3 @@ jobs:
       run: mvn -B package --file ./P02-VehiclesAPI/pricing-service/pom.xml
     - name: Build vehicles api with Maven
       run: mvn -B package --file ./P02-VehiclesAPI/vehicles-api/pom.xml
-    - name: Build eureka server with Maven
-      run: mvn -B package --file ./P02-VehiclesAPI/eureka-server/pom.xml
