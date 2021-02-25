@@ -22,8 +22,6 @@ jobs:
         java-version: 1.11
     - name: Build boogle maps with Maven
       run: mvn -B package --file ./P02-VehiclesAPI/boogle-maps/pom.xml
-    - name: Build eureka server with Maven
-      run: mvn -B package --file ./P02-VehiclesAPI/eureka-server/pom.xml
     - name: Build pricing service with Maven
       run: mvn -B package --file ./P02-VehiclesAPI/pricing-service/pom.xml
     - name: Build vehicles api with Maven
