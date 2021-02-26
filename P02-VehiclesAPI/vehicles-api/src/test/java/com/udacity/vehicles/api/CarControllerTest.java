@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -119,6 +120,39 @@ public class CarControllerTest {
 		given(carService.findById(any())).willThrow(CarNotFoundException.class);
 		mvc.perform(get(new URI("/cars/666")).accept(MediaType.APPLICATION_JSON_UTF8))
 				.andExpect(status().is4xxClientError());
+	}
+
+	/** 
+	 * Tests the update operation for a single car with a known ID.
+	 * 
+	 * Even though we changed the values before put(), we need to use the "old" values for comparison. 
+	 * This is due to the mock configuration for CarService, as save() always returns the same object.
+	 * The real test for the update functionality is located in {@link com.udacity.vehicles.service.CarServiceTest#testUpdate()}
+	 * 
+	 * @throws Exception if there is no car available with the given ID.
+	 */
+	@Test
+	public void updateCar() throws Exception {
+		mvc.perform(get(new URI("/cars/" + car.getId())).accept(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value(car.getId()))
+				.andExpect(jsonPath("$.condition").value(car.getCondition().toString()))
+				.andExpect(jsonPath("$.details.model").value(car.getDetails().getModel()))
+				.andExpect(jsonPath("$.details.body").value(car.getDetails().getBody()))
+				.andExpect(jsonPath("$.location.lat").value(car.getLocation().getLat()));
+
+		Car car2 = getCar();
+		car2.setCondition(Condition.NEW);
+		car2.getDetails().setBody("changedBody");
+		car2.setLocation(new Location(50.730610, -63.935242));
+		String carAsJSON = json.write(car2).getJson();
+		
+		mvc.perform(put(new URI("/cars/" + car.getId())).content(carAsJSON)
+				.contentType(MediaType.APPLICATION_JSON_UTF8).accept(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.condition").value(car.getCondition().toString()))
+				.andExpect(jsonPath("$.details.model").value(car.getDetails().getModel()))
+				.andExpect(jsonPath("$.details.body").value(car.getDetails().getBody()))
+				.andExpect(jsonPath("$.location.lat").value(car.getLocation().getLat()));
 	}
 
 	/**

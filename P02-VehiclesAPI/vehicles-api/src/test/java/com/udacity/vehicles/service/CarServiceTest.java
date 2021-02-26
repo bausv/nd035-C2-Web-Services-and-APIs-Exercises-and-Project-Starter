@@ -93,6 +93,19 @@ public class CarServiceTest {
 		when_carServiceDeleteIsInvoked(car);
 		then_theRowCountIsDecreasedByOne(countBefore);
 	}
+	
+	@Test
+	public void testUpdate() {
+		Car car = given_aCar();
+		car.setCondition(Condition.USED);
+		car.getDetails().setBody("changedBody");
+		car.setLocation(new Location(33.3, 44.4));
+		Car changed = carService.save(car);
+		assertThat(changed, is(notNullValue()));
+		assertThat(changed.getCondition(), is(equalTo(car.getCondition())));
+		assertThat(changed.getDetails().getBody(), is(equalTo(car.getDetails().getBody())));
+		assertThat(changed.getLocation().getLat(), is(equalTo(car.getLocation().getLat())));
+	}
 
 	private void then_theRowCountIsDecreasedByOne(long countBefore) {
 		assertThat(carRepository.count(), is(equalTo(countBefore - 1)));
